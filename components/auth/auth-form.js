@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import classes from "./auth-form.module.css";
+import { signIn } from "next-auth/client";
 
 function AuthForm() {
   const dispatch = useDispatch();
@@ -12,18 +13,24 @@ function AuthForm() {
     setIsLogin((prevState) => !prevState);
   }
 
-  function onSubmit(e) {
+  async function onSubmit(e) {
     e.preventDefault();
-    if (isLogin) return;
-    dispatch({
-      type: "CREATE_USER_REQUESTED",
-      payload: {
-        data: {
-          email,
-          password,
+    if (isLogin) {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
+    } else
+      dispatch({
+        type: "CREATE_USER_REQUESTED",
+        payload: {
+          data: {
+            email,
+            password,
+          },
         },
-      },
-    });
+      });
   }
 
   return (
